@@ -114,6 +114,14 @@ func (l Logger) Errorf(msg string, data ...interface{}) {
 	}
 }
 
+// Fatalf print error messages and exit.
+func (l Logger) Fatalf(msg string, data ...interface{}) {
+	if l.LogLevel >= Error {
+		l.Printf(l.errStr+msg, data...)
+	}
+	os.Exit(1)
+}
+
 func Debugf(msg string, data ...interface{}) {
 	if Default.LogLevel >= Debug {
 		Default.Printf(Default.debugStr+msg, data...)
@@ -139,4 +147,12 @@ func Errorf(msg string, data ...interface{}) {
 	if Default.LogLevel >= Error {
 		Default.Printf(Default.errStr+msg, data...)
 	}
+}
+
+// Fatalf print error messages and exit.
+func Fatalf(msg string, data ...interface{}) {
+	if Default.LogLevel >= Error {
+		Default.Printf(Default.errStr+msg, data...)
+	}
+	os.Exit(1)
 }
