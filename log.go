@@ -43,7 +43,7 @@ type Config struct {
 }
 
 var (
-	Default = New(log.New(os.Stdout, "\r\n", log.LstdFlags), Config{
+	Default = New(log.New(os.Stderr, "\n", log.LstdFlags), Config{
 		LogLevel: Debug,
 		Colorful: true,
 	})
