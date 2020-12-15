@@ -51,17 +51,17 @@ var (
 
 func New(writer Writer, config Config) *Logger {
 	var (
-		debugStr = "%s\n[debug] "
-		infoStr  = "%s\n[info]  "
-		warnStr  = "%s\n[warn]  "
-		errStr   = "%s\n[error] "
+		debugStr = "[debug] "
+		infoStr  = "[info]  "
+		warnStr  = "[warn]  "
+		errStr   = "[error] "
 	)
 
 	if config.Colorful {
-		debugStr = "%s\n" + "[debug] "
-		infoStr = Green + "%s\n" + Reset + Green + "[info]  " + Reset
-		warnStr = BlueBold + "%s\n" + Reset + Magenta + "[warn]  " + Reset
-		errStr = Magenta + "%s\n" + Reset + Red + "[error] " + Reset
+		debugStr = "[debug] "
+		infoStr = Green + Reset + Green + "[info]  " + Reset
+		warnStr = BlueBold + Reset + Magenta + "[warn]  " + Reset
+		errStr = Magenta + Reset + Red + "[error] " + Reset
 	}
 
 	return &Logger{
