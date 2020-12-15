@@ -1,2 +1,2 @@
-# log
+# logger
 Log with colors
