@@ -1,10 +1,8 @@
 package logger
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
-	"time"
 )
 
 // Colors
@@ -31,6 +29,7 @@ const (
 	Error
 	Warn
 	Info
+	Debug
 )
 
 // Writer log writer interface
@@ -39,79 +38,105 @@ type Writer interface {
 }
 
 type Config struct {
-	SlowThreshold time.Duration
-	Colorful      bool
-	LogLevel      LogLevel
-}
-
-// Interface logger interface
-type Interface interface {
-	LogMode(LogLevel) Interface
-	Infof(string, ...interface{})
-	Warnf(string, ...interface{})
-	Errorf(string, ...interface{})
+	Colorful bool
+	LogLevel LogLevel
 }
 
 var (
-	Discard = New(log.New(ioutil.Discard, "", log.LstdFlags), Config{})
 	Default = New(log.New(os.Stdout, "\r\n", log.LstdFlags), Config{
 		LogLevel: Info,
 		Colorful: true,
 	})
 )
 
-func New(writer Writer, config Config) Interface {
+func New(writer Writer, config Config) *Logger {
 	var (
-		infoStr = "%s\n[info] "
-		warnStr = "%s\n[warn] "
-		errStr  = "%s\n[error] "
+		debugStr = "%s\n[debug] "
+		infoStr  = "%s\n[info]  "
+		warnStr  = "%s\n[warn]  "
+		errStr   = "%s\n[error] "
 	)
 
 	if config.Colorful {
-		infoStr = Green + "%s\n" + Reset + Green + "[info] " + Reset
-		warnStr = BlueBold + "%s\n" + Reset + Magenta + "[warn] " + Reset
+		debugStr = "%s\n" + "[debug] "
+		infoStr = Green + "%s\n" + Reset + Green + "[info]  " + Reset
+		warnStr = BlueBold + "%s\n" + Reset + Magenta + "[warn]  " + Reset
 		errStr = Magenta + "%s\n" + Reset + Red + "[error] " + Reset
 	}
 
-	return &logger{
-		Writer:  writer,
-		Config:  config,
-		infoStr: infoStr,
-		warnStr: warnStr,
-		errStr:  errStr,
+	return &Logger{
+		Writer:   writer,
+		Config:   config,
+		debugStr: debugStr,
+		infoStr:  infoStr,
+		warnStr:  warnStr,
+		errStr:   errStr,
 	}
 }
 
-type logger struct {
+type Logger struct {
 	Writer
 	Config
-	infoStr, warnStr, errStr string
+	debugStr, infoStr, warnStr, errStr string
 }
 
-// LogMode log mode
-func (l *logger) LogMode(level LogLevel) Interface {
-	newlogger := *l
-	newlogger.LogLevel = level
-	return &newlogger
+// LogMode log mode.
+func (l *Logger) LogMode(level LogLevel) *Logger {
+	l.LogLevel = level
+	return l
 }
 
-// Info print info
-func (l logger) Infof(msg string, data ...interface{}) {
+// Debug print debug messages.
+func (l Logger) Debugf(msg string, data ...interface{}) {
+	if l.LogLevel >= Debug {
+		l.Printf(l.debugStr+msg, data...)
+	}
+}
+
+// Info print info.
+func (l Logger) Infof(msg string, data ...interface{}) {
 	if l.LogLevel >= Info {
 		l.Printf(l.infoStr+msg, data...)
 	}
 }
 
-// Warn print warn messages
-func (l logger) Warnf(msg string, data ...interface{}) {
+// Warn print warn messages.
+func (l Logger) Warnf(msg string, data ...interface{}) {
 	if l.LogLevel >= Warn {
 		l.Printf(l.warnStr+msg, data...)
 	}
 }
 
-// Error print error messages
-func (l logger) Errorf(msg string, data ...interface{}) {
+// Error print error messages.
+func (l Logger) Errorf(msg string, data ...interface{}) {
 	if l.LogLevel >= Error {
 		l.Printf(l.errStr+msg, data...)
+	}
+}
+
+func Debugf(msg string, data ...interface{}) {
+	if Default.LogLevel >= Debug {
+		Default.Printf(Default.debugStr+msg, data...)
+	}
+}
+
+// Info print info.
+func Infof(msg string, data ...interface{}) {
+	if Default.LogLevel >= Info {
+		Default.Printf(Default.infoStr+msg, data...)
+	}
+}
+
+// Warn print warn messages.
+func Warnf(msg string, data ...interface{}) {
+	if Default.LogLevel >= Warn {
+		Default.Printf(Default.warnStr+msg, data...)
+	}
+}
+
+// Error print error messages.
+func Errorf(msg string, data ...interface{}) {
+	if Default.LogLevel >= Error {
+		Default.Printf(Default.errStr+msg, data...)
 	}
 }
