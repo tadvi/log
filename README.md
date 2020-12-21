@@ -1,3 +1,3 @@
 # log
 
-Log with colors. It uses standard logger behind the screnes.
+Log with colors. Uses standard logger but adds colors and log levels.
